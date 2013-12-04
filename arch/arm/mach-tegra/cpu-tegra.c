@@ -57,7 +57,7 @@ static bool is_suspended;
 static int suspend_index;
 static unsigned int volt_capped_speed;
 static struct pm_qos_request cpufreq_max_req;
-
+static struct pm_qos_request cpufreq_min_req;
 
 static bool force_policy_max;
 
@@ -722,6 +722,8 @@ static int tegra_pm_notify(struct notifier_block *nb, unsigned long event,
 	if (event == PM_SUSPEND_PREPARE) {
 		int i;
 
+		pm_qos_update_request(&cpufreq_min_req,
+			freq_table[suspend_index].frequency);
 		pm_qos_update_request(&cpufreq_max_req,
 			freq_table[suspend_index].frequency);
 
@@ -752,6 +754,8 @@ static int tegra_pm_notify(struct notifier_block *nb, unsigned long event,
 
 		pm_qos_update_request(&cpufreq_max_req,
 			PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+		pm_qos_update_request(&cpufreq_min_req,
+			PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
 	}
 
 	return NOTIFY_OK;
@@ -887,6 +891,8 @@ static int __init tegra_cpufreq_init(void)
 
 	pm_qos_add_request(&cpufreq_max_req, PM_QOS_CPU_FREQ_MAX,
 		PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+	pm_qos_add_request(&cpufreq_min_req, PM_QOS_CPU_FREQ_MIN,
+		PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
 
 	ret = register_pm_notifier(&tegra_cpu_pm_notifier);
 
