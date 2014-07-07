@@ -83,6 +83,11 @@ static struct gpio_init_pin_info p1988_manual_gpio_mode[] = {
 	GPIO_INIT_PIN_MODE(TEGRA_GPIO_PQ1, true, 0), /* hall sensor input */
 };
 
+static __initdata struct tegra_pingroup_config e2542_uart_config_pinmux[] = {
+	DEFAULT_PINMUX(SDMMC3_CMD,    UARTA,       NORMAL,    NORMAL,   INPUT),
+	DEFAULT_PINMUX(SDMMC3_DAT1,   UARTA,       NORMAL,    NORMAL,   OUTPUT),
+};
+
 static void __init tegratab_gpio_init_configure(void)
 {
 	int len;
@@ -161,6 +166,10 @@ int __init tegratab_pinmux_init(void)
 
 	tegra_pinmux_config_table(manual_config_pinmux,
 		ARRAY_SIZE(manual_config_pinmux));
+
+	if (get_tegra_uart_debug_port_id() == UART_FROM_SDCARD)
+		tegra_pinmux_config_table(e2542_uart_config_pinmux,
+					ARRAY_SIZE(e2542_uart_config_pinmux));
 
 	return 0;
 }
